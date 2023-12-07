@@ -1,0 +1,1 @@
+This is just to practice API calls with the GIPHY API!
