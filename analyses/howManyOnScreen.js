@@ -8,18 +8,26 @@ async function analyzeGiphyData() {
         // Extract gif widths
         const gifWidths = giphyData.map(gif => parseInt(gif.images.original.width));
 
-        // Run function for relevant analysis
+        // Get the average
         const averageWidth = calculateAverageWidth(gifWidths);
 
-        // console.log('All widths:', gifWidths)
-        console.log('Average width:', averageWidth);
+        // Set a margin of 10px in between gifs
+        const margin = 10
+
+        // Set the average screen size
+        const screenWidth = 1024
+
+        // Perform analysis, how many gifs can fit side by side width-wise
+        const gifsScreenWidth = Math.floor(screenWidth / (averageWidth + margin));
+
+        console.log('Number of gifs side by side:', gifsScreenWidth);
     } catch (error) {
-        console.error('Error analyzing Giphy data:', error);
+        console.error('Error:', error);
     }
 }
 
 function calculateAverageWidth(widths) {
-    // Initialize empty sum 
+    // Initialize empty sum to start
     let widthSum = 0;
 
     // Loop to sum up all widths
@@ -32,6 +40,5 @@ function calculateAverageWidth(widths) {
 
     return averageWidth;
 }
-
 
 analyzeGiphyData()

@@ -6,11 +6,12 @@ async function analyzeGiphyData() {
         const giphyData = await fetchGiphyData();
 
         // Extract gif widths
-        const gifWidths = giphyData.map(gif => gif.images.original.width);
+        const gifWidths = giphyData.map(gif => parseInt(gif.images.original.width));
 
         // Calculate the most common width on the extracted widths
         const mostCommonWidth = calculateMostCommonWidth(gifWidths);
 
+        console.log("All widths:", gifWidths)
         console.log('Most common width:', mostCommonWidth);
     } catch (error) {
         console.error('Error analyzing Giphy data:', error);
