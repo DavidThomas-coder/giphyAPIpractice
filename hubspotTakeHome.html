@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Hubspot Take-Home</title>
+</head>
+<body>
+    <script>
+
+const apiUrl = "https://candidate.hubteam.com/candidateTest/v3/problem/dataset?userKey=4d880b71df4b33754694dc9a90d6";
+const postUrl = "https://candidate.hubteam.com/candidateTest/v3/problem/result?userKey=4d880b71df4b33754694dc9a90d6";
+
+
+function findBestDateByCountry(data) {
+    const bestDatesByCountry = {};
+
+    // Iterate through each partner
+    for (const partner of data.partners) {
+        const country = partner.country;
+        const email = partner.email;
+
+        if (!bestDatesByCountry[country]) {
+            bestDatesByCountry[country] = {
+                bestDate: null,
+                maxAttendees: -1,
+            };
+        }
+
+        const partnerDates = partner.availableDates;
+
+        for (let i = 0; i < partnerDates.length - 1; i++) {
+            const currentDate = partnerDates[i];
+            const nextDate = partnerDates[i + 1];
+            const attendingBothDays = data.partners.filter((p) =>
+                p.country === country &&
+                p.availableDates.includes(currentDate) &&
+                p.availableDates.includes(nextDate)
+            );
+
+            if (attendingBothDays.length > bestDatesByCountry[country].maxAttendees) {
+                bestDatesByCountry[country].bestDate = currentDate;
+                bestDatesByCountry[country].maxAttendees = attendingBothDays.length;
+                bestDatesByCountry[country].attendees = attendingBothDays.map((p) => p.email);
+            }
+        }
+    }
+
+    // Convert the result to the desired format
+    const countries = Object.keys(bestDatesByCountry).map((country) => ({
+        name: country,
+        startDate: bestDatesByCountry[country].bestDate,
+        attendeeCount: bestDatesByCountry[country].maxAttendees,
+        attendees: bestDatesByCountry[country].attendees,
+    }));
+
+    return countries;
+}
+
+// Fetch data from the API
+fetch(apiUrl)
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        // Check the structure of data to ensure compatibility
+        const partnersData = data.partners || [];
+
+        // Call the function to find the best dates by country and process the data here
+        const bestDatesByCountry = findBestDateByCountry({ partners: partnersData });
+
+        // Prepare the JSON response format
+        const countries = bestDatesByCountry.map(countryData => ({
+            attendeeCount: countryData.attendeeCount,
+            attendees: countryData.attendees,
+            name: countryData.name,
+            startDate: countryData.startDate
+        }));
+
+        // Send a POST request with the JSON payload
+        const postPayload = {
+            countries
+        };
+
+        fetch(postUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(postPayload),
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(result => {
+            console.log('API response:', result);
+        })
+        .catch(error => {
+            console.error('POST error:', error);
+        });
+    })
+    .catch(error => {
+        console.error('Fetch error:', error);
+    });
+
+
+
+</script>
+</body>
+</html>
