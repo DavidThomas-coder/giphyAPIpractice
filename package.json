@@ -1,7 +1,9 @@
 {
-    "type": "module",
-    "scripts": {
-      "start": "node apiCall.js"
-    }
+  "type": "module",
+  "scripts": {
+    "start": "node apiCall.js"
+  },
+  "dependencies": {
+    "node-fetch": "^3.3.2"
   }
-  
+}
