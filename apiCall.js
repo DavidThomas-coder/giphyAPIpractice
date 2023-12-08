@@ -12,7 +12,10 @@ fetch(apiUrl)
     })
     .then(data => {
         // Show the data in console.log
-        // console.log(data);
+        console.log(data);
+
+        // Perform any necessary analysis 
+        // -----------------
 
         // Extract titles
         const gifTitles = data.data.map(gif => gif.title);
@@ -28,7 +31,7 @@ fetch(apiUrl)
         
 
         // Choose what to display
-        console.log(gifTitles)
+        // console.log(gifTitles)
 
     })
     .catch(error => {
